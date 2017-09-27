@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {WindowRef} from '../WindowRef';
 
 import { AppComponent } from './app.component';
+import { SharedService } from './services/shared.service';
 
 @NgModule({
   declarations: [
@@ -11,7 +12,10 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule
   ],
-  providers: [WindowRef],
+  providers: [
+	  WindowRef,
+	  SharedService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

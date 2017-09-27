@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewInit  } from '@angular/core';
-import '../assets/js/literallycanvas-0.4.14/js/literallycanvas.min.js'
 import { WindowRef } from '../WindowRef';
 
 @Component({
