@@ -1,0 +1,108 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>VidyoConnector</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	<!-- We've provide some simple styling to get you started. -->
+	<link   href="VidyoConnector.css" rel="stylesheet" type="text/css" >
+	<script type="text/javascript">
+	function LoadHelper() {
+		// Opera 8.0+
+		var isOpera = (navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ;
+		// Firefox
+		var isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
+		// Chrome 1+
+		var isChrome = navigator.userAgent.indexOf("Chrome") != -1;
+		// Safari 
+		var isSafari = !isChrome && navigator.userAgent.indexOf("Safari") != -1;
+		// Internet Explorer 6-11
+		var isIE = (navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true );
+		// Edge 20+
+		var isEdge = !isIE && !!window.StyleMedia;
+		// Check if Mac
+		var isMac = navigator.platform.indexOf('Mac') > -1;
+		// Check if PC
+		var isPC = navigator.platform.indexOf('Win') > -1;
+	
+		var downloadPath = "https://static.vidyo.io/4.1.16.8/bin";
+		var downloadPathApp = '';
+		var downloadPathPlugIn = '';
+	
+		if (isMac) {
+			downloadPath += "/macos";
+			downloadPathApp = downloadPath + "/VidyoConnectorAppInstaller.pkg";
+			downloadPathPlugIn = downloadPath + "/VidyoClientPluginInstaller.pkg";
+		} else if (isPC) {
+			downloadPath += "/windows";
+			// Check for 32 vs 64 bit windows
+			var is64bit = navigator.userAgent.indexOf('WOW64') > -1 ||  navigator.userAgent.indexOf('Win64') > -1 || window.navigator.platform == 'Win64';
+			if (is64bit) {
+				downloadPath += "/x64";
+			} else {
+				downloadPath += "/Win32";
+			}
+			downloadPathApp = downloadPath + "/VidyoConnectorAppInstaller.exe"
+			downloadPathPlugIn = downloadPath + "/VidyoClientPluginInstaller.exe";
+		}
+	
+		if (!isMac && !isPC) {
+			/* Mobile */
+			downloadType = "MOBILE";
+		} else {
+			/* Supports App */
+			downloadType = "APP";
+		}
+	
+		ShowHelper({downloadType: downloadType, downloadPathApp: downloadPathApp, downloadPathPlugIn: downloadPathPlugIn});
+	}
+	
+	function ShowHelper(status) {
+		var helperText = '';	
+		var protocolHandlerLink = 'vidyoconnector://?host=' + getUrlParameterByName("host") + '&token=' + getUrlParameterByName("token") + '&displayName=' + getUrlParameterByName("displayName") + '&resourceId=' + getUrlParameterByName("resourceId");
+		switch (status.downloadType) {
+			case "MOBILE":
+				helperText += '<h2>Please download VidyoConnector from the App Store.</h2>';
+				helperText += '<span> and then </span>';
+				helperText += '<a href="' + protocolHandlerLink + '">launch</a>';
+				break;
+			case "APP":
+				helperText += '<h2>Please download and launch VidyoConnector.</h2>';
+				helperText += '<a href="' + status.downloadPathApp + '">download</a>';
+				helperText += '<span> and then </span>';
+				helperText += '<a href="' + protocolHandlerLink + '">launch</a>';
+				break;
+		}
+		
+		$("#helperText").html(helperText);
+		$("#helper").removeClass("hidden");	
+		
+		/* launch */
+		window.location = protocolHandlerLink;
+	}
+	
+	function getUrlParameterByName(name) {
+		var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+		return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+	}
+	</script>
+</head> 
+
+<!-- We execute the VidyoConnectorApp library on page load 
+to hook up all of the events to elements. -->
+<body id="vidyoConnector" onload="LoadHelper()">
+	<div id="helper">
+		<table>
+		<tr>
+			<td><img class="logo" src="Images/VidyoIcon.png"/></td>
+		</tr>
+		<tr>
+			<td id="helperText">Loading...</td>
+		</tr>
+		</table>
+	</div>
+</body>
+</html>
