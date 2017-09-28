@@ -10,8 +10,6 @@
   <!-- dependency: React.js -->
   <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-with-addons.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js"></script>
-  <script type="text/javascript" src="https://static.vidyo.io/4.1.16.8/javascript/VidyoClient/VidyoClient.js?onload=onVidyoClientLoaded&webrtc=true&plugin=false&webrtcLogLevel=info"></script>
-
 </head>
 <body>
   <app-root></app-root>
@@ -25,4 +23,25 @@
     <!--{imageURLPrefix: '/static/img'}-->
   <!--);-->
 <!--</script>-->
+<script>
+  function onVidyoClientLoaded(status) {
+    switch (status.state) {
+      case "READY":
+        var event = new CustomEvent('vidyoclient:ready', {detail: VC});
+        document.dispatchEvent(event);
+        console.log(VC);
+        break;
+      case "RETRYING":     // The library operating is temporarily paused
+        break;
+      case "FAILED":       // The library operating has stopped
+        break;
+      case "FAILEDVERSION":
+        break;
+      case "NOTAVAILABLE": // The library is not available
+        break;
+    }
+
+    return true; // Return true to reload the plugins if not available
+  }
+</script>
 </html>

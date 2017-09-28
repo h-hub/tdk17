@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Renderer2 } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import { SharedService } from '../services/shared.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { SharedService } from '../services/shared.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class VideoRendererComponent implements OnInit, AfterViewInit {
+export class VideoRendererComponent {
 
   isLoading = true;
   isConnected = false;
@@ -16,18 +16,9 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
   constructor(
     private renderer: Renderer2,
     private sharedService: SharedService) {
-    // this.$timeout = $timeout;
-    // this.$rootScope = $rootScope;
-
     this.listenEvent();
     this.listenConnectionChangeOrder();
     this.loadVidyoClientLibrary();
-  }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewInit() {
   }
 
   listenConnectionChangeOrder() {
@@ -63,6 +54,7 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
 
   listenEvent() {
     document.addEventListener('vidyoclient:ready', (e) => {
+      console.log(e);
       this.renderVideo(e);
     });
   }
@@ -70,7 +62,7 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
   renderVideo(VC) {
 
     setTimeout(function() {
-      VC.CreateVidyoConnector({
+      VC.detail.CreateVidyoConnector({
         viewId: 'renderer',                            // Div ID where the composited video will be rendered, see VidyoConnector.html
         viewStyle: 'VIDYO_CONNECTORVIEWSTYLE_Default', // Visual style of the composited renderer
         remoteParticipants: 16,                        // Maximum number of participants
@@ -85,7 +77,7 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
         this.isConnectionError = true;
       });
-    });
+    }, 1);
   }
 
   loadVidyoClientLibrary() {

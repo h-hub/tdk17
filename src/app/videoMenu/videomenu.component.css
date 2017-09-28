@@ -1,0 +1,66 @@
+.sidebar-view {
+  width: 195px;
+  height: 100vh;
+  border-right: 1px solid #eee;
+  position: relative;
+  z-index: 1;
+}
+.sidebar-view hr {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.sidebar-view .btn-chat {
+  position: absolute;
+  right: 15px;
+}
+.sidebar-view .btn-chat img {
+  width: 25px;
+}
+.sidebar-view .bottom-view {
+  position: absolute;
+  bottom: 15px;
+  height: 50px;
+  width: 100%;
+}
+
+.btn-control img {
+  width: 25px;
+}
+
+.control-button {
+  padding-left: 15px;
+  padding-right: 10px;
+}
+
+.a-center {
+  align-content: center;
+  position: relative;
+}
+
+.p-l-15 {
+  padding-left: 15px;
+}
+
+.p-r-15 {
+  padding-right: 15px;
+}
+
+.p-t-15 {
+  padding-top: 5px;
+}
+
+.live-text {
+  color: #6BED3A;
+}
+
+ul.participants li {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.logo {
+  width: auto;
+  height: 120px;
+  background: url(https://static.vidyo.io/latest/connector/Images/VidyoIcon.png) no-repeat center center;
+  background-size: 70% 100%;
+}

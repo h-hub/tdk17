@@ -22,14 +22,12 @@
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
         "assets/js/literallycanvas-0.4.14/css/literallycanvas.css",
         "styles.css",
-        "solar.bootstrap.css",
-        "assets/VidyoConnector/js/VidyoConnector.css"
+        "solar.bootstrap.css"
       ],
       "scripts": [
         "../node_modules/jquery/dist/jquery.min.js",
         "../node_modules/bootstrap/dist/js/bootstrap.min.js",
-        "assets/js/literallycanvas-0.4.14/js/literallycanvas.min.js",
-        "assets/VidyoConnector/js/VidyoConnector.js"
+        "assets/js/literallycanvas-0.4.14/js/literallycanvas.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
