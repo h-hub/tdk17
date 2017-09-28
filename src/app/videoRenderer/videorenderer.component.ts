@@ -1,8 +1,8 @@
-import { Component, OnInit, AfterViewInit, Renderer } from '@angular/core';
-import { SharedService } from '../services/shared.service'; 
+import { Component, OnInit, AfterViewInit, Renderer2 } from '@angular/core';
+import { SharedService } from '../services/shared.service';
 
 @Component({
-  selector: 'video-chat',
+  selector: 'app-video-chat',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -10,16 +10,16 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
 
   isLoading = true;
   isConnected = false;
-  roomId = "";
+  roomId = '';
   isConnectionError = false;
 
   constructor(
-    private renderer : Renderer,
+    private renderer: Renderer2,
     private sharedService: SharedService) {
     // this.$timeout = $timeout;
     // this.$rootScope = $rootScope;
-    
-    // this.listenEvent();
+
+    this.listenEvent();
     this.listenConnectionChangeOrder();
     this.loadVidyoClientLibrary();
   }
@@ -32,62 +32,69 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
 
   listenConnectionChangeOrder() {
 
-    this.renderer.listen('connection', 'on', () => {
+    this.renderer.listen('document', 'connection:on', () => {
       if (!this.sharedService.vidyoConnector) {
         this.loadVidyoClientLibrary();
       } else {
-        //this.connectVidyo(this.sharedService.vidyoConnector);
+        this.connectVidyo(this.sharedService.vidyoConnector);
       }
     })
 
-    this.renderer.listen('connection', 'off', () => {
-
+    this.renderer.listen('document', 'connection:off', () => {
+      this.disconnectVidyo(this.sharedService.vidyoConnector);
     });
 
-    this.renderer.listen('micMute', 'on', () => {
-
+    this.renderer.listen('document', 'micMute:on', () => {
+      this.sharedService.vidyoConnector.SetMicrophonePrivacy(true);
     });
 
-    this.renderer.listen('micMute', 'off', () => {
-
+    this.renderer.listen('document', 'micMute:off', () => {
+      this.sharedService.vidyoConnector.SetMicrophonePrivacy(false);
     });
 
-    this.renderer.listen('cameraMute', 'on', () => {
-
+    this.renderer.listen('document', 'cameraMute:on', () => {
+      this.sharedService.vidyoConnector.SetCameraPrivacy(true);
     });
 
-    this.renderer.listen('cameraMute', 'off', () => {
-
+    this.renderer.listen('document', 'cameraMute:off', () => {
+      this.sharedService.vidyoConnector.SetCameraPrivacy(false);
     });
+  }
 
-    // this.$rootScope.$on('connection:off', () => {
-    //   this.disconnectVidyo(this.$rootScope.vidyoConnector);
-    // });
+  listenEvent() {
+    document.addEventListener('vidyoclient:ready', (e) => {
+      this.renderVideo(e);
+    });
+  }
 
-    // this.$rootScope.$on('micMute:on', () => {
-    //   this.$rootScope.vidyoConnector.SetMicrophonePrivacy(true);
-    // });
+  renderVideo(VC) {
 
-    // this.$rootScope.$on('micMute:off', () => {
-    //   this.$rootScope.vidyoConnector.SetMicrophonePrivacy(false);
-    // });
-
-    // this.$rootScope.$on('cameraMute:on', () => {
-    //   this.$rootScope.vidyoConnector.SetCameraPrivacy(true);
-    // });
-
-    // this.$rootScope.$on('cameraMute:off', () => {
-    //   this.$rootScope.vidyoConnector.SetCameraPrivacy(false);
-    // });
+    setTimeout(function() {
+      VC.CreateVidyoConnector({
+        viewId: 'renderer',                            // Div ID where the composited video will be rendered, see VidyoConnector.html
+        viewStyle: 'VIDYO_CONNECTORVIEWSTYLE_Default', // Visual style of the composited renderer
+        remoteParticipants: 16,                        // Maximum number of participants
+        logFileFilter: 'warning all@VidyoConnector info@VidyoClient',
+        logFileName: '',
+        userData: ''
+      }).then((vidyoConnector) => {
+        this.$rootScope.vidyoConnector = vidyoConnector;
+        this.connectVidyo(vidyoConnector);
+      }).catch(() => {
+        console.error('CreateVidyoConnector Failed');
+        this.isLoading = false;
+        this.isConnectionError = true;
+      });
+    });
   }
 
   loadVidyoClientLibrary() {
-    var webrtc = true;
-    var plugin = false;
+    let webrtc = true;
+    let plugin = false;
 
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    var isFirefox = userAgent.indexOf("Firefox") != -1;
-    var isChrome = userAgent.indexOf("Chrome") != -1;
+    const userAgent = navigator.userAgent || navigator.vendor; // || window.opera
+    const isFirefox = userAgent.indexOf('Firefox') !== -1;
+    const isChrome = userAgent.indexOf('Chrome') !== -1;
 
     if (isChrome || isFirefox) {
       /* Supports WebRTC */
@@ -100,10 +107,95 @@ export class VideoRendererComponent implements OnInit, AfterViewInit {
       console.log('Not chrome or Firefox');
     }
 
-    var script = document.createElement('script');
+    const script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = 'https://static.vidyo.io/latest/javascript/VidyoClient/VidyoClient.js?onload=onVidyoClientLoaded&webrtc=' + webrtc + '&plugin=' + plugin;
+    script.src = 'https://static.vidyo.io/latest/javascript/VidyoClient/VidyoClient.js?' +
+      'onload=onVidyoClientLoaded&webrtc=' + webrtc + '&plugin=' + plugin;
     document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  disconnectVidyo(vidyoConnector) {
+    vidyoConnector.Disconnect();
+  }
+
+  connectVidyo(vidyoConnector) {
+    console.log('passed in token', this.sharedService.user.token);
+    console.log('passed in user name', this.sharedService.user.name);
+    console.log('passed in room id', this.sharedService.user.roomId);
+
+    this.roomId = this.sharedService.user.roomId || 'demoRoom';
+    vidyoConnector.Connect({
+      host: 'prod.vidyo.io',
+      token: this.sharedService.user.token,
+      displayName: this.sharedService.user.name,
+      resourceId: this.sharedService.user.roomId,
+
+      onSuccess: () => {
+        // Connected
+        console.log('connected!');
+        this.isConnected = true;
+        this.sharedService.isConnecte = true;
+        //$broadcast('connectedStatus', { isConnected: true });
+      },
+      onFailure: (reason) => {
+        // Failed
+        this.isConnectionError = true;
+        console.log('failed! The reason: ', reason);
+      },
+      onDisconnected: (reason) => {
+        // Disconnected
+        this.isConnected = false;
+        console.log('disconnected! Reason: ', reason);
+        this.sharedService.isConnecte = false;
+        //this.$rootScope.$broadcast('connectedStatus', { isConnected: false });
+      }
+    }).then((status) => {
+      this.isLoading = false;
+      if (status) {
+        this.handlePaticipants(vidyoConnector);
+        this.receiveMessage(vidyoConnector);
+      } else {
+        this.isConnectionError = true;
+        console.error('ConnectCall Failed');
+      }
+    }).catch(() => {
+      this.isConnectionError = true;
+      this.isLoading = false;
+      console.error('ConnectCall Failed');
+    });
+  }
+
+  receiveMessage(vidyoConnector) {
+    vidyoConnector.RegisterMessageEventListener({
+      onChatMessageReceived: (participant, chatMessage) => {
+        vidyoConnector.onSendMessage({ id: participant.id, name: participant.name, content: chatMessage.body });
+      }
+    }).then(() => {
+      console.log('RegisterParticipantEventListener Success');
+    }).catch(() => {
+      console.log('RegisterParticipantEventListener Failed');
+    });
+  }
+
+  handlePaticipants(vidyoConnector) {
+    vidyoConnector.RegisterParticipantEventListener(
+      {
+        onJoined: (participant) => {
+          console.log('Joined', participant);
+          vidyoConnector.onAddUser({ id: participant.id, name: participant.name });
+        },
+        onLeft: (participant) => {
+          console.log('Left', participant);
+          vidyoConnector.onRemoveUser({ id: participant.id, name: participant.name });
+        },
+        onDynamicChanged: (participants, cameras) => { /* Ordered array of participants according to rank */ },
+        onLoudestChanged: (participant, audioOnly) => { /* Current loudest speaker */ }
+      }
+    ).then(() => {
+      console.log('RegisterParticipantEventListener Success');
+    }).catch(() => {
+      console.log('RegisterParticipantEventListener Failed');
+    });
   }
 
 }
