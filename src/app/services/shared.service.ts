@@ -5,8 +5,17 @@ import {User} from './user';
 export class SharedService {
   vidyoConnector: any;
   user: User;
-  isConnecte: boolean
-  setData(data: any) {
+  isConnected: boolean;
+  setVidyoConnector(data: any) {
     this.vidyoConnector = data;
+  }
+  getVidyoConnector() {
+    return this.vidyoConnector;
+  }
+  setConnected(data: boolean) {
+    this.isConnected = data;
+  }
+  getConnected() {
+    return this.isConnected;
   }
 }

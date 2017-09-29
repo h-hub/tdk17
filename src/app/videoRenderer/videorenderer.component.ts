@@ -25,70 +25,42 @@ export class VideoRendererComponent {
 
   listenConnectionChangeOrder() {
     this.eventService.on('connection:on', () => {
-      if (!this.sharedService.vidyoConnector) {
+      if (!this.sharedService.getVidyoConnector()) {
         this.loadVidyoClientLibrary();
       } else {
-        this.connectVidyo(this.sharedService.vidyoConnector);
+        this.connectVidyo(this.sharedService.getVidyoConnector());
       }
     });
 
     this.eventService.on('connection:off', () => {
-      this.disconnectVidyo(this.sharedService.vidyoConnector);
+      this.disconnectVidyo(this.sharedService.getVidyoConnector());
     });
 
     this.eventService.on('micMute:on', () => {
-      this.sharedService.vidyoConnector.SetMicrophonePrivacy(true);
+      this.sharedService.getVidyoConnector().SetMicrophonePrivacy(true);
     });
 
     this.eventService.on('micMute:off', () => {
-      this.sharedService.vidyoConnector.SetMicrophonePrivacy(false);
+      this.sharedService.getVidyoConnector().SetMicrophonePrivacy(false);
     });
 
     this.eventService.on('cameraMute:on', () => {
-      this.sharedService.vidyoConnector.SetCameraPrivacy(true);
+      this.sharedService.getVidyoConnector().SetCameraPrivacy(true);
     });
 
     this.eventService.on('cameraMute:off', () => {
-      this.sharedService.vidyoConnector.SetCameraPrivacy(false);
-    });
-
-    this.renderer.listen('document', 'connection:on', () => {
-      if (!this.sharedService.vidyoConnector) {
-        this.loadVidyoClientLibrary();
-      } else {
-        this.connectVidyo(this.sharedService.vidyoConnector);
-      }
-    })
-
-    this.renderer.listen('document', 'connection:off', () => {
-      this.disconnectVidyo(this.sharedService.vidyoConnector);
-    });
-
-    this.renderer.listen('document', 'micMute:on', () => {
-      this.sharedService.vidyoConnector.SetMicrophonePrivacy(true);
-    });
-
-    this.renderer.listen('document', 'micMute:off', () => {
-      this.sharedService.vidyoConnector.SetMicrophonePrivacy(false);
-    });
-
-    this.renderer.listen('document', 'cameraMute:on', () => {
-      this.sharedService.vidyoConnector.SetCameraPrivacy(true);
-    });
-
-    this.renderer.listen('document', 'cameraMute:off', () => {
-      this.sharedService.vidyoConnector.SetCameraPrivacy(false);
+      this.sharedService.getVidyoConnector().SetCameraPrivacy(false);
     });
   }
 
   listenEvent() {
     document.addEventListener('vidyoclient:ready', (e) => {
       console.log(e);
-      this.renderVideo(e);
+      this.renderVideo(e, this.sharedService);
     });
   }
 
-  renderVideo(VC) {
+  renderVideo(VC, sharedService) {
 
     setTimeout(function() {
       VC.detail.CreateVidyoConnector({
@@ -99,7 +71,8 @@ export class VideoRendererComponent {
         logFileName: '',
         userData: ''
       }).then((vidyoConnector) => {
-        this.sharedService.vidyoConnector = vidyoConnector;
+        sharedService.setVidyoConnector(vidyoConnector);
+        console.log('-HARSHA--' + this.sharedService.vidyoConnector);
         this.connectVidyo(vidyoConnector);
       }).catch(() => {
         console.log('CreateVidyoConnector Failed');
@@ -155,7 +128,7 @@ export class VideoRendererComponent {
         // Connected
         console.log('connected!');
         this.isConnected = true;
-        this.sharedService.isConnecte = true;
+        this.sharedService.setConnected(true)
         //$broadcast('connectedStatus', { isConnected: true });
       },
       onFailure: (reason) => {
@@ -167,7 +140,7 @@ export class VideoRendererComponent {
         // Disconnected
         this.isConnected = false;
         console.log('disconnected! Reason: ', reason);
-        this.sharedService.isConnecte = false;
+        this.sharedService.setConnected(false);
         //this.$rootScope.$broadcast('connectedStatus', { isConnected: false });
       }
     }).then((status) => {
