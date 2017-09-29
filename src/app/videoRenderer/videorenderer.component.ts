@@ -1,5 +1,6 @@
 import { Component, Renderer2 } from '@angular/core';
 import { SharedService } from '../services/shared.service';
+import { EventService } from '../services/event.service';
 
 @Component({
   selector: 'app-video-chat',
@@ -15,13 +16,41 @@ export class VideoRendererComponent {
 
   constructor(
     private renderer: Renderer2,
-    private sharedService: SharedService) {
+    private sharedService: SharedService,
+    private eventService: EventService) {
     this.listenEvent();
     this.listenConnectionChangeOrder();
     this.loadVidyoClientLibrary();
   }
 
   listenConnectionChangeOrder() {
+    this.eventService.on('connection:on', () => {
+      if (!this.sharedService.vidyoConnector) {
+        this.loadVidyoClientLibrary();
+      } else {
+        this.connectVidyo(this.sharedService.vidyoConnector);
+      }
+    });
+
+    this.eventService.on('connection:off', () => {
+      this.disconnectVidyo(this.sharedService.vidyoConnector);
+    });
+
+    this.eventService.on('micMute:on', () => {
+      this.sharedService.vidyoConnector.SetMicrophonePrivacy(true);
+    });
+
+    this.eventService.on('micMute:off', () => {
+      this.sharedService.vidyoConnector.SetMicrophonePrivacy(false);
+    });
+
+    this.eventService.on('cameraMute:on', () => {
+      this.sharedService.vidyoConnector.SetCameraPrivacy(true);
+    });
+
+    this.eventService.on('cameraMute:off', () => {
+      this.sharedService.vidyoConnector.SetCameraPrivacy(false);
+    });
 
     this.renderer.listen('document', 'connection:on', () => {
       if (!this.sharedService.vidyoConnector) {
@@ -70,10 +99,10 @@ export class VideoRendererComponent {
         logFileName: '',
         userData: ''
       }).then((vidyoConnector) => {
-        this.$rootScope.vidyoConnector = vidyoConnector;
+        this.sharedService.vidyoConnector = vidyoConnector;
         this.connectVidyo(vidyoConnector);
       }).catch(() => {
-        console.error('CreateVidyoConnector Failed');
+        console.log('CreateVidyoConnector Failed');
         this.isLoading = false;
         this.isConnectionError = true;
       });

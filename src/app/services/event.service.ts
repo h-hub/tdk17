@@ -7,6 +7,7 @@ export class EventService {
   observer: Observer<any>;
 
   constructor() {
+    console.log('constructor');
     this.observable = Observable.create((observer: Observer<any>) => {
       this.observer = observer;
     }).share();
