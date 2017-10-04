@@ -28,8 +28,8 @@
 }
 
 .control-button {
-  padding-left: 15px;
-  padding-right: 10px;
+  /*padding-left: 15px;*/
+  /*padding-right: 10px;*/
 }
 
 .a-center {
@@ -63,4 +63,8 @@ ul.participants li {
   height: 120px;
   background: url(https://static.vidyo.io/latest/connector/Images/VidyoIcon.png) no-repeat center center;
   background-size: 70% 100%;
+}
+
+.video-buttons{
+  padding: 0px;
 }

@@ -1,6 +1,7 @@
 .video-area {
   height: 60vh;
   overflow: auto;
+  padding: 0px;
 }
 .video-area.expanded {
   height: 100vh;

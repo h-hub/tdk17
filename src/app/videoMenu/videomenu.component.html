@@ -1,13 +1,5 @@
-<div class="sidebar-view pull-left">
-  <div class="p-l-15 p-r-15 logo">
-    <h3></h3>
-  </div>
-  <div>
-    <hr>
-    <span class="live-text" *ngIf="isConnected">Live Video</span>
-    <span *ngIf="!isConnected">Connect to Live Video</span>
-    <hr>
-  </div>
+
+<div class="col-md-6 video-buttons">
   <div class="control-button">
     <button class="btn btn-default btn-control" (click)="toggleCamera()">
       <img src="{{muteCamera? '/assets/icons/camera_off.svg' : '/assets/icons/camera.svg'}}"/>
@@ -19,32 +11,4 @@
       <img src="{{isConnected? '/assets/icons/disconnect.svg' : '/assets/icons/connect.png'}}"/>
     </button>
   </div>
-  <hr>
-  <div class="participant-list">
-    <div class="p-l-15 p-r-15">
-      <h4>Participants</h4>
-    </div>
-    <hr>
-    <!--<div class="p-l-15 p-r-15" *ngIf="$ctrl.users.length == 0 && $ctrl.isConnected">-->
-      <!--<p>No other users</p>-->
-    <!--</div>-->
-    <!--<ul class="list-unstyled participants">-->
-      <!--<li ng-repeat="user in $ctrl.users">{{user.name}}</li>-->
-    <!--</ul>-->
-  </div>
-  <div class="bottom-view">
-    <hr>
-    <div class="control-button">
-      <button class="btn btn-default btn-control" [disabled]=1>
-        <img src="{{'/assets/icons/share.png'}}"/>
-      </button>
-      <button class="btn btn-default btn-control" [disabled]=1>
-        <img src="{{'/assets/icons/PIP.png'}}"/>
-      </button>
-      <button class="btn btn-default btn-control" (click)="openChatWindow()">
-        <img src="{{'/assets/icons/chat.png'}}"/>
-      </button>
-    </div>
-  </div>
-  <!-- <a href class="open-chat" ng-click="$ctrl.openChatWindow()"><i class="fa fa-comment-o"></i></a> -->
 </div>
